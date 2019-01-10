@@ -3,7 +3,6 @@
 const fs = require('fs')
 const tmp = require('tmp')
 const util = require('util')
-const childProcess = require('child_process')
 
 const index = require('./index')
 const spawn = require('./src/spawn')
@@ -13,16 +12,13 @@ jest.unmock('child_process')
 
 const access = util.promisify(fs.access)
 
-let spawnSpy
 let dirSyncSpy
 
 beforeEach(() => {
-  spawnSpy = jest.spyOn(childProcess, 'spawn')
   dirSyncSpy = jest.spyOn(tmp, 'dirSync')
 })
 
 afterEach(() => {
-  spawnSpy.mockRestore()
   dirSyncSpy.mockRestore()
 })
 

@@ -18,19 +18,6 @@ afterEach(() => {
   writeFileSync.mockRestore()
 })
 
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`generateFileData should generate a string with or without the shebang 1`] = `
-"node /Users/armstroma/Desktop/work/spawn-with-mocks/src/messenger.js mv a/b /c/d/e \\"$@\\"
-"
-`
-
-exports[`generateFileData should generate a string with or without the shebang 2`] = `
-"#!/bin/sh
-node /Users/armstroma/Desktop/work/spawn-with-mocks/src/messenger.js mv a/b /c/d/e \\"$@\\"
-"
-`
-
 describe('generateFileData', () => {
   it('should generate a string with or without the shebang', () => {
     expect(generateFileData('mv a/b /c/d/e')).not.toMatch(/^#!\/bin\/sh/)
