@@ -2,7 +2,7 @@
 
 > Mock shell commands with JavaScript
 
-Intended for testing scripts where specific commands should be mocked. It gives access to the input and output for each mock, which can be used for making assertions.
+Intended for testing shell scripts while mocking specific commands. Make assertions about the input for each command, and/or mock their stdout, stderr, and exit codes.
 
 [![Build Status](https://travis-ci.org/raingerber/spawn-with-mocks.svg?branch=master)](https://travis-ci.org/raingerber/spawn-with-mocks) [![codecov](https://codecov.io/gh/raingerber/spawn-with-mocks/branch/master/graph/badge.svg)](https://codecov.io/gh/raingerber/spawn-with-mocks)
 
@@ -22,24 +22,25 @@ When testing the script, we decide to mock `curl`, but not `grep`:
 const spawn = require('spawn-with-mocks').spawnPromise
 const assert = require('assert')
 
-const testFile = './example.sh'
-
-const options = {
-  mocks: {
-    // Creating the mock:
-    curl: (input) => {
-      assert.strictEqual(input, '<some-example-url>')
-      // Defining the mock output:
-      return {
-        exit: 0,
-        stdout: ['Frog', 'Shrimp', 'Crab'].join('\n'),
-        stderr: ''
-      }
-    }
+const curl = (input) => {
+  // The mock will receive the input
+  // that was passed to the shell command
+  assert.strictEqual(input, '<some-example-url>')
+  // Defining the mock output:
+  return {
+    code: 0,
+    stdout: ['Frog', 'Shrimp', 'Crab'].join('\n'),
+    stderr: ''
   }
 }
 
-const data = await spawn('sh', [testFile], options)
+const options = {
+  mocks: {
+    curl
+  }
+}
+
+const data = await spawn('sh', ['./example.sh'], options)
 
 assert.deepStrictEqual(data, {
   code: 0,
@@ -65,43 +66,34 @@ Each key is a shell command, and the values are functions that should return an 
 
 When returning objects, they can have the following properties:
 
-* `code`
-
-  * type: `Number`
-
-  * default: `0`
-
-  * exit the command with this status code
-
-* `stdout`
-
-  * type: `String`
-
-  * default: `''`
-
-  * pipe this to stdout
-
-* `stderr`
-
-  * type: `String`
-
-  * default: `''`
-
-  * pipe this to stderr
+```javascript
+{
+  // exit the command with this status code (default: 0)
+  code: Number,
+  // pipe this to stdout (default: '')
+  stdout: String,
+  // pipe this to stderr (default: '')
+  stderr: String
+}
+```
 
 **Number**
 
-If a mock returns a number, it will be used as `code` (`stdout` and `stderr` will be `""`).
+If a mock returns a number, it will be used as `code`
+
+- `stdout` and `stderr` will be `''`
 
 **String**
 
-If a mock returns a string, it will be used as `stdout` (`code` will be `0` and `stderr` will be `""`).
+If a mock returns a string, it will be used as `stdout`
+
+- `code` will be `0` and `stderr` will be `''`
 
 #### options.stdio
 
 type: `String|Array`
 
-The function also modifies the native [stdio option](https://nodejs.org/api/child_process.html#child_process_options_stdio). The last element of stdio will always be `'ipc'`, because the library uses that to message the spawned process. A ChildProcess can only have one IPC channel, so `'ipc'` should not be set by the input options.
+The function also modifies the native [stdio option](https://nodejs.org/api/child_process.html#child_process_options_stdio). The last element of stdio will always be `'ipc'`, because the library uses that to message the spawned process. A [ChildProcess](https://nodejs.org/api/child_process.html#child_process_class_childprocess) can only have one IPC channel, so `'ipc'` should not be set by the input options.
 
 ### spawnPromise (command[, args][, options])
 
@@ -123,6 +115,10 @@ Like `spawn`, but it returns a Promise that resolves when the ChildProcess fires
 ## How it Works
 
 Each mock is an executable that's stored in a temporary `PATH` directory. Currently, the mocks do not work for all commands (such as builtins). This could be changed in a future version by using shell functions to create the mocks.
+
+## See Also
+
+[jest-shell-matchers](https://www.npmjs.com/package/jest-shell-matchers) - make assertions about the output from spawn-with-mocks
 
 ## LICENSE
 
