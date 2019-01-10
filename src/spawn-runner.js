@@ -26,21 +26,20 @@ function spawnWithMocks (...input) {
   const mockNames = Object.keys(mocks)
   if (mockNames.indexOf('node') !== -1) {
     tmpObj.removeCallback()
-    throw new Error('mock-shell does not support mocking the node command')
+    throw new Error('spawn-with-mocks does not support mocking the node command')
   }
 
   let subprocess
   try {
     aliasGenerator.createAliasFiles(tmpObj.name, mockNames, shebang)
     subprocess = spawn.spawnProcess(input, mocks)
-    subprocess.on('close', () => {
-      tmpObj.removeCallback()
-    })
   } catch (error) {
     tmpObj.removeCallback()
     throw error
   }
-
+  subprocess.on('close', () => {
+    tmpObj.removeCallback()
+  })
   return subprocess
 }
 
