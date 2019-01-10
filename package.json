@@ -9,10 +9,10 @@
   },
   "license": "MIT",
   "scripts": {
-    "precommit": "yarn lint:fix && yarn test",
     "lint": "standard",
     "lint:fix": "standard --fix",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "precommit": "npm run lint:fix && npm run test"
   },
   "keywords": [
     "spawn",
