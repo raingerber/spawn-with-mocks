@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`example.js should resolve without errors 1`] = `
+Object {
+  "code": 0,
+  "signal": "",
+  "stderr": "",
+  "stdout": "Frog
+",
+}
+`;

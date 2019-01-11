@@ -13,7 +13,7 @@ In this script, we use `curl` to make a network request, then `grep` to filter b
 ```bash
 # example.sh
 
-curl "<some-example-url>" | grep F
+curl "<example-url>" | grep F
 ```
 
 When testing the script, we decide to mock `curl`, but not `grep`:
@@ -25,7 +25,7 @@ const assert = require('assert')
 const curl = (input) => {
   // The mock will receive the input
   // that was passed to the shell command
-  assert.strictEqual(input, '<some-example-url>')
+  assert.strictEqual(input, '<example-url>')
   // Defining the mock output:
   return {
     code: 0,
@@ -40,15 +40,15 @@ const options = {
   }
 }
 
-const data = await spawn('sh', ['./example.sh'], options)
-
-assert.deepStrictEqual(data, {
-  code: 0,
-  signal: '',
-  // grep is not being mocked, so the
-  // actual grep command will be used
-  stdout: 'Frog\n',
-  stderr: ''
+spawn('sh', ['./example.sh'], options).then(data => {
+  assert.deepStrictEqual(data, {
+    code: 0,
+    signal: '',
+    // grep is not being mocked, so the
+    // actual grep command will be used
+    stdout: 'Frog\n',
+    stderr: ''
+  })
 })
 ```
 
